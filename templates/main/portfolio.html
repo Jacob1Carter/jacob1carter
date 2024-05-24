@@ -1,0 +1,98 @@
+<!-- main/index.html -->
+
+<html lang="en-gb">
+
+    {% include "base/header.html" %}
+
+    <body>
+        {% include "base/navbar.html" %}
+
+        <div class="container main-content">
+            <h1>Portfolio</h1>
+            <div class="portfolio-container">
+                <h2>Config</h2>
+                <h2>Segment</h2>
+
+                <form class="portfolio-option" method="POST" action="/portfolio">
+                    <div class="form-group portfolio-group">
+                        <label for="config-id" class="portfolio-action">Load from preset: </label>
+                        <input type="number" name="config-id" id="config-id" class="form-control portfolio-action" placeholder="Preset ID">
+                        <button type="submit" name="edit" value="config" class="btn btn-primary portfolio-action">New portfolio config</button>
+                    </div>
+
+                    <div class="form-group portfolio-group">
+                        <label for="segment-id" class="portfolio-action">Load from preset: </label>
+                        <input type="number" name="segment-id" id="segment-id" class="form-control portfolio-action" placeholder="Preset ID">
+                        <button type="submit" name="edit" value="segment" class="btn btn-primary portfolio-action">New portfolio segment</button>
+                    </div>
+                </form>
+
+                <form class="portfolio-option" method="POST" action="/portfolio">
+                    <div class="form-group portfolio-group">
+                        <label for="preset-id" class="portfolio-action">View a preset: </label>
+                        <input type="number" name="config-preset-id" id="preset-id" class="form-control portfolio-action" value="{{ config_id }}">
+                        <button type="submit" class="btn btn-primary portfolio-action">Load</button>
+                    </div>
+
+                    <div class="form-group portfolio-group">
+                        <label for="preset-id" class="portfolio-action">View a preset: </label>
+                        <input type="number" name="segment-preset-id" id="preset-id" class="form-control portfolio-action" value="{{ segment_id }}">
+                        <button type="submit" class="btn btn-primary portfolio-action">Load</button>
+                    </div>
+                </form>
+
+                <div class="portfolio-preview portfolio-config-preview">
+                    {% if config_error != None %}
+                        {{ config_error }}
+                    {% endif %}
+                    {% if show_config %}
+                        <p>Page name: {{ config_data["pagename"] }}</p>
+                        <p>Title: {{ config_data["title"] }}</p>
+                        <p>Bio: {{ config_data["bio"] }}</p>
+                        <p>Links:</p>
+                        <div class="subdata">
+                            {% for link in config_data["links"] %}
+                                <p>{{ link }}: <a href="{{ config_data["links"][link] }}">{{ config_data["links"][link] }}</a></p>
+                            {% endfor %}
+                        </div>
+                        <p>Banners:</p>
+                        <div class="subdata">
+                            {% for banner in config_data["banners"] %}
+                                <p>{{ banner }}:</p>
+                                <img class="data-image" alt="{{ config_data["banners"][banner] }}" src="data:image/png;base64,{{ config_data["banners"][banner] }}">
+                            {% endfor %}
+                        </div>
+                        <p>Icon:</p>
+                        <img class="data-image" alt="{{ config_data["icon"] }}" src="data:image/png;base64,{{ config_data["icon"] }}">
+                        <p>Favicon:</p>
+                        <img class="data-image" alt="{{ config_data["favicon"] }}" src="data:image/png;base64,{{ config_data["favicon"] }}">
+                        <p>Segments:</p>
+                        <div class="subdata">
+                            {% for segment in config_data["segments"] %}
+                                <p>{{ segment }}</p>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="portfolio-preview portfolio-segment-preview">
+                    {% if segment_error != None %}
+                        {{ config_error }}
+                    {% endif %}
+                    {% if show_segment %}
+                        {% for data in segment_data %}
+                            <p>{{ data }}: {{ segment_data[data] }}</p>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+            </div>
+
+            <a href="/" class="btn btn-primary btn-return">return</a>
+        </div>
+
+        {% include "base/footer.html" %}
+    </body>
+
+</html>
+
+<!-- /main/index.html -->
