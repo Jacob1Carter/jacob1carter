@@ -44,6 +44,18 @@
     max-height: 60px;
 }
 
+.indent-inputs {
+    margin-left: 35px;
+}
+
+.indent-inputs div {
+    margin: 15px;
+}
+
+.banner-preview, .icon-preview, .favicon-preview {
+    max-height: 50px;
+}
+
 .btn-return {
     margin: 50px 20px 20px;
 }

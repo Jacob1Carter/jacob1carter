@@ -12,26 +12,144 @@
             {% if error != None %}
                 {{ error }}
             {% endif %}
+            {% if post_error != None %}
+                {{ post_error }}
+            {% endif %}
+            {% if post_response != None %}
+                {{ post_response }}
+            {% endif %}
 
-            <form action="/portfolio/new-config" method="post">
-                <label for="pagename">Page name:</label>
-                <input type="text" name="pagename" id="pagename" class="form-control" value="{% if data != None %}{{ data["pagename"] }}{% endif %}">
+            {% if data != None %}
+                <form action="/portfolio/new-config" method="post" enctype="multipart/form-data">
+                    <label for="pagename">Page name:</label>
+                    <input type="text" name="pagename" id="pagename" class="form-control" value="{% if data != None %}{{ data["pagename"] }}{% endif %}">
 
-                <label for="title">Title:</label>
-                <input type="text" name="title" id="title" class="form-control" value="{% if data != None %}{{ data["title"] }}{% endif %}">
+                    <label for="title">Title:</label>
+                    <input type="text" name="title" id="title" class="form-control" value="{% if data != None %}{{ data["title"] }}{% endif %}">
 
-                <label for="bio">Bio:</label>
-                <textarea name="bio" id="bio" class="form-control">{% if data != None %}{{ data["bio"] }}{% endif %}</textarea>
+                    <label for="bio">Bio:</label>
+                    <textarea name="bio" id="bio" class="form-control">{% if data != None %}{{ data["bio"] }}{% endif %}</textarea>
 
-                <label for="links">Links:</label>
-                {% for link in data["links"] %}
-                    <input type="text" name="linkname" class="form-control" value="{{ link }}">
-                    <input type="text" name="linkurl" class="form-control" value="{{ data["links"][link] }}">
-                {% endfor %}
+                    <h5>Links:</h5>
+                    <div class="indent-inputs" id="links-container">
+                        {% for linkname, linkurl in data["links"].items() %}
+                            <div class="link-group" id="link-group{{ loop.index - 1 }}">
+                                <label for="linkname{{ loop.index - 1 }}">Link name:</label>
+                                <input type="text" id="linkname{{ loop.index - 1 }}" name="linkname{{ loop.index - 1 }}" class="form-control" value="{{ linkname }}">
+                                <label for="linkurl{{ loop.index - 1 }}">Link URL:</label>
+                                <input type="text" id="linkurl{{ loop.index - 1 }}" name="linkurl{{ loop.index - 1 }}" class="form-control" value="{{ linkurl }}">
+                                <button type="button" id="{{ loop.index - 1 }}" class="btn btn-danger remove-link" data-index="{{ loop.index - 1 }}">Remove</button>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    <button type="button" class="btn btn-primary" id="add-link">Add link</button>
 
-            </form>
+                    <h5>Banners:</h5>
+                    <div class="indent-inputs" id="banners-container">
+                        {% for bannername, bannerdata in data["banners"].items() %}
+                            <div class="banner-group" id="banner-group{{ loop.index - 1 }}">
+                                <label for="bannername{{ loop.index - 1 }}">Banner name:</label>
+                                <input type="text" id="bannername{{ loop.index - 1 }}" name="bannername{{ loop.index - 1 }}" class="form-control" value="{{ bannername }}">
+                                <label for="bannerdata{{ loop.index - 1 }}">Banner data:</label>
+                                <input type="file" id="bannerdata{{ loop.index - 1 }}" accept=".png" name="bannerdata{{ loop.index - 1 }}" class="form-control">
+                                <img src="{% if data != None %}data:image/png;base64,{{ bannerdata }}{% endif %}" alt="banner" class="banner-preview">
+                                <button type="button" id="{{ loop.index - 1 }}" class="btn btn-danger remove-banner" data-index="{{ loop.index - 1 }}">Remove</button>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    <button type="button" class="btn btn-primary" id="add-banner">Add banner</button>
 
-            <a href="/" class="btn btn-primary btn-return">return</a>
+                    <label for="icondata">Icon:</label>
+                    <input type="file" name="icondata" id="icondata" class="form-control" accept=".png">
+                    <img src="{% if data != None %}data:image/png;base64,{{ data["icon"] }}{% endif %}" alt="icon" class="icon-preview">
+
+                    <h5>Segments:</h5>
+                    <div class="indent-inputs" id="segments-container">
+                        {% for segmentid in data["segments"] %}
+                            <div class="segment-group" id="segment-group{{ loop.index - 1 }}">
+                                <label for="segment{{ loop.index - 1 }}">Segment id:</label>
+                                <input type="number" id="segment{{ loop.index - 1 }}" name="segment{{ loop.index - 1 }}" class="form-control" value="{{ segmentid }}">
+                                <button type="button" id="{{ loop.index - 1 }}" class="btn btn-danger remove-segment" data-index="{{ loop.index - 1 }}">Remove</button>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    <button type="button" class="btn btn-primary" id="add-segment">Add segment</button>
+
+                    <label for="favicondata">Favicon:</label>
+                    <input type="file" name="favicondata" id="favicondata" class="form-control" accept=".ico" >
+                    <img src="{% if data != None %}data:image/ico;base64,{{ data["favicon"] }}{% endif %}" alt="favicon" class="favicon-preview">
+
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                </form>
+
+                <script>
+                    function addElement(containerId, className, label1, label1Text, label2, label2Text, buttonClass) {
+                        let container = document.getElementById(containerId);
+                        let highestId = 0;
+                        for (let i = 0; i < container.children.length; i++) {
+                            let id = parseInt(container.children[i].id.slice(-1));
+                            if (id > highestId) {
+                                highestId = id;
+                            }
+                        }
+                        let index = highestId + 1;
+                        let group = document.createElement('div');
+                        group.classList.add(className);
+                        group.id = `${className}${index}`;
+                        if (label1 === "segment") {
+                            group.innerHTML = `
+                                <label for="${label1}${index}">${label1Text}</label>
+                                <input type="number" id="${label1}${index}" name="${label1}${index}" class="form-control">
+                                <button type="button" id="${index}" class="btn btn-danger ${buttonClass}" data-index="${index}">Remove</button>
+                            `;
+                        }
+                        else {
+                            group.innerHTML = `
+                            <label for="${label1}${index}">${label1Text}</label>
+                            <input type="text" id="${label1}${index}" name="${label1}${index}" class="form-control">
+                            <label for="${label2}${index}">${label2Text}</label>
+                            <input type="text" id="${label2}${index}" name="${label2}${index}" class="form-control">
+                            <button type="button" id="${index}" class="btn btn-danger ${buttonClass}" data-index="${index}">Remove</button>
+                        `;
+                        }
+                        container.appendChild(group);
+                    }
+
+                    function removeElement(event, containerId, className) {
+                        let elementID = event.target.id;
+                        let element = document.getElementById(`${className}${elementID}`);
+                        if (element) {
+                            element.remove();
+                        }
+                    }
+
+                    document.getElementById('add-link').addEventListener('click', function() {
+                        addElement('links-container', 'link-group', 'linkname', 'Link name:', 'linkurl', 'Link URL:', 'remove-link');
+                    });
+
+                    document.getElementById('add-banner').addEventListener('click', function() {
+                        addElement('banners-container', 'banner-group', 'bannername', 'Banner name:', 'bannerdata', 'Banner data:', 'remove-banner');
+                    });
+
+                    document.getElementById('add-segment').addEventListener('click', function() {
+                        addElement('segments-container', 'segment-group', 'segment', 'Segment id:', '', '', 'remove-segment');
+                    });
+
+                    document.addEventListener('click', function(event) {
+                        if (event.target.classList.contains('remove-link')) {
+                            removeElement(event, 'links-container', 'link-group');
+                        }
+                        if (event.target.classList.contains('remove-banner')) {
+                            removeElement(event, 'banners-container', 'banner-group');
+                        }
+                        if (event.target.classList.contains('remove-segment')) {
+                            removeElement(event, 'segments-container', 'segment-group');
+                        }
+                    });
+                </script>
+            {% endif %}
+
+            <a href="/portfolio" class="btn btn-primary btn-return">return</a>
 
         </div>
 

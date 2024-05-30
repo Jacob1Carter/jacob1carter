@@ -1,9 +1,17 @@
 from flask import Flask, render_template, request, redirect
 import requests
+import base64
 
 carterapi_baseurl = "https://carterapi.pythonanywhere.com/"
 
 app = Flask(__name__)
+
+
+def encode_image(image):
+    image_data = image.read()
+    base64_image = base64.b64encode(image_data).decode('utf-8')
+
+    return base64_image
 
 
 @app.route("/")
@@ -33,11 +41,8 @@ def portfolio():
 
     if request.method == "POST":
         edit = request.form.get("edit")
-        print(edit)
         if edit:
             edit_id = request.form.get(f"{edit}-id")
-            print(f"{edit}-id")
-            print(edit_id)
             if edit_id and edit_id.isdigit():
                 return redirect(f"/portfolio/new-{edit}?id={edit_id}")
             else:
@@ -95,6 +100,8 @@ def new_config():
         'Content-Type': 'application/json'
     }
 
+    post_error = None
+    post_response = None
     error = None
 
     response = requests.post(f"{carterapi_baseurl}/get/portfolio-config", headers=headers, json=request_data).json()
@@ -104,11 +111,70 @@ def new_config():
         data = None
         error = response
 
+    if request.method == "POST":
+
+        new_data = {
+            "pagename": request.form.get("pagename"),
+            "title": request.form.get("title"),
+            "bio": request.form.get("bio"),
+            "links": {},
+            "banners": {},
+            "icon": "",
+            "segments": [],
+            "favicon": ""
+        }
+
+        if "icondata" in request.files and request.files[f"icondata"].filename != '':
+            icondata = request.files["icondata"]
+            new_data["icon"] = encode_image(icondata)
+        else:
+            new_data["icon"] = data["icon"]
+
+        if "favicondata" in request.files and request.files[f"favicondata"].filename != '':
+            favicondata = request.files["favicondata"]
+            new_data["favicon"] = encode_image(favicondata)
+        else:
+            new_data["favicon"] = data["favicon"]
+
+        for key in request.form:
+            if key.startswith("linkname"):
+                link_id = key[-1]
+                if request.form[key] != "" and request.form[f"linkurl{link_id}"] != "":
+                    new_data["links"][request.form[key]] = request.form[f"linkurl{link_id}"]
+
+            if key.startswith("bannername"):
+                banner_id = key[-1]
+                if request.form[key] != "":
+                    if f"bannerdata{banner_id}" in request.files and request.files[f"bannerdata{banner_id}"].filename != '':
+                        bannerdata = request.files[f"bannerdata{banner_id}"]
+                        new_data["banners"][request.form[key]] = encode_image(bannerdata)
+                    elif request.form[key] in data["banners"]:
+                        new_data["banners"][request.form[key]] = data["banners"][request.form[key]]
+
+            if key.startswith("segment"):
+                if request.form[key] != "" and request.form[key].isdigit():
+                    new_data["segments"].append(int(request.form[key]))
+
+        response = requests.post(f"{carterapi_baseurl}/post/new/portfolio-config", headers=headers, json=new_data).json()
+        if response["result"] == "success":
+            post_response = response
+        else:
+            post_error = response
+
+        response = requests.post(f"{carterapi_baseurl}/get/portfolio-config", headers=headers, json={}).json()
+        if response["result"] == "success":
+            data = response["data"]
+        else:
+            data = None
+            error = response
+
     return render_template(
         "main/new-config.html",
         title="New Portfolio Config",
         data=data,
-        error=error
+        error=error,
+        post_response=post_response,
+        post_error=post_error
     )
 
 
