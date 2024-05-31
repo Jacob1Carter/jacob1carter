@@ -45,7 +45,7 @@
                     {% if config_error != None %}
                         {{ config_error }}
                     {% endif %}
-                    {% if show_config %}
+                    {% if config_data != None %}
                         <p>Page name: {{ config_data["pagename"] }}</p>
                         <p>Title: {{ config_data["title"] }}</p>
                         <p>Bio: {{ config_data["bio"] }}</p>
@@ -79,10 +79,24 @@
                     {% if segment_error != None %}
                         {{ config_error }}
                     {% endif %}
-                    {% if show_segment %}
-                        {% for data in segment_data %}
-                            <p>{{ data }}: {{ segment_data[data] }}</p>
-                        {% endfor %}
+                    {% if segment_data != None %}
+                        <p>Name: {{ segment_data["name"] }}</p>
+                        <p>Title: {{ segment_data["title"] }}</p>
+                        <p>Text: {{ segment_data["text"] }}</p>
+                        <p>Images:</p>
+                        <div class="subdata">
+                            {% for image in segment_data["images"] %}
+                                <img class="data-image" alt="segment image" src="data:image/png;base64,{{ image }}">
+                            {% endfor %}
+                        </div>
+                        <p>Icon:</p>
+                        <img class="data-image" alt="{{ segment_data["icon"] }}" src="data:image/png;base64,{{ segment_data["icon"] }}">
+                        <p>Links:</p>
+                        <div class="subdata">
+                            {% for link in segment_data["links"] %}
+                                <p>{{ link }}: <a href="{{ segment_data["links"][link] }}">{{ segment_data["links"][link] }}</a></p>
+                            {% endfor %}
+                        </div>
                     {% endif %}
                 </div>
             </div>
