@@ -84,6 +84,98 @@
                 <input type="file" name="favicondata" id="favicondata" class="form-control" accept=".ico" >
                 <img src="{% if data != None %}data:image/ico;base64,{{ data["favicon"] }}{% endif %}" alt="favicon" class="favicon-preview">
 
+                <h5>Colours:</h5>
+                <p id="dark-toggle">Dark mode ></p>
+                <div class="colours-dark" id="dark-content" style="display: none">
+                    <label for="main-colour-dark">Main colour:</label>
+                    <input type="color" name="main-colour-dark" id="main-colour-dark" class="form-control" value="{% if data != None %}{{ data["colours"]["dark"]["main-colour"] }}{% endif %}">
+
+                    <label for="off-colour-dark">Off colour:</label>
+                    <input type="color" name="off-colour-dark" id="off-colour-dark" class="form-control" value="{% if data != None %}{{ data["colours"]["dark"]["off-colour"] }}{% endif %}">
+
+                    <label for="bg-colour-1-dark">Background colour 1:</label>
+                    <input type="color" name="bg-colour-1-dark" id="bg-colour-1-dark" class="form-control" value="{% if data != None %}{{ data["colours"]["dark"]["bg-colour-1"] }}{% endif %}">
+
+                    <label for="bg-colour-2-dark">Background colour 2:</label>
+                    <input type="color" name="bg-colour-2-dark" id="bg-colour-2-dark" class="form-control" value="{% if data != None %}{{ data["colours"]["dark"]["bg-colour-2"] }}{% endif %}">
+
+                    <label for="p-s-colour-dark">Primary element solid colour:</label>
+                    <input type="color" name="p-s-colour-dark" id="p-s-colour-dark" class="form-control" value="{% if data != None %}{{ data["colours"]["dark"]["p-s-colour"] }}{% endif %}">
+
+                    <label for="p-t-colour-dark">Primary element transparent colour:</label>
+                    <input type="color" name="p-t-colour-dark" id="p-t-colour-dark" class="form-control" value="{% if data != None %}{{ data["colours"]["dark"]["p-t-colour"] }}{% endif %}">
+                    <label for="p-t-colour-transparency-dark">Transparency:</label>
+                    <input type="text" pattern="^[0-1]?(\.\d+)?$" name="p-t-colour-transparency-dark" id="p-t-colour-transparency-dark" class="form-control" value="{% if data != None %}{{ data["colours"]["dark"]["p-t-colour-transparency"] }}{% endif %}">
+
+                    <label for="p-a-colour-dark">Primary element alt colour:</label>
+                    <input type="color" name="p-a-colour-dark" id="p-a-colour-dark" class="form-control" value="{% if data != None %}{{ data["colours"]["dark"]["p-a-colour"] }}{% endif %}">
+
+                    <label for="s-s-colour-dark">Secondary element solid colour:</label>
+                    <input type="color" name="s-s-colour-dark" id="s-s-colour-dark" class="form-control" value="{% if data != None %}{{ data["colours"]["dark"]["s-s-colour"] }}{% endif %}">
+
+                    <label for="s-t-colour-dark">Secondary element transparent colour:</label>
+                    <input type="color" name="s-t-colour-dark" id="s-t-colour-dark" class="form-control" value="{% if data != None %}{{ data["colours"]["dark"]["s-t-colour"] }}{% endif %}">
+                    <label for="s-t-colour-transparency-dark">Transparency:</label>
+                    <input type="text" pattern="^[0-1]?(\.\d+)?$" name="s-t-colour-transparency-dark" id="s-t-colour-transparency-dark" class="form-control" value="{% if data != None %}{{ data["colours"]["dark"]["p-t-colour-transparency"] }}{% endif %}">
+                </div>
+                <p id="light-toggle">Light mode ></p>
+                <div class="colours-light" id="light-content" style="display: none">
+                    <label for="main-colour-light">Main colour:</label>
+                    <input type="color" name="main-colour-light" id="main-colour-light" class="form-control" value="{% if data != None %}{{ data["colours"]["light"]["main-colour"] }}{% endif %}">
+
+                    <label for="off-colour-light">Off colour:</label>
+                    <input type="color" name="off-colour-light" id="off-colour-light" class="form-control" value="{% if data != None %}{{ data["colours"]["light"]["off-colour"] }}{% endif %}">
+
+                    <label for="bg-colour-1-light">Background colour 1:</label>
+                    <input type="color" name="bg-colour-1-light" id="bg-colour-1-light" class="form-control" value="{% if data != None %}{{ data["colours"]["light"]["bg-colour-1"] }}{% endif %}">
+
+                    <label for="bg-colour-2-light">Background colour 2:</label>
+                    <input type="color" name="bg-colour-2-light" id="bg-colour-2-light" class="form-control" value="{% if data != None %}{{ data["colours"]["light"]["bg-colour-2"] }}{% endif %}">
+
+                    <label for="p-s-colour-light">Primary element solid colour:</label>
+                    <input type="color" name="p-s-colour-light" id="p-s-colour-light" class="form-control" value="{% if data != None %}{{ data["colours"]["light"]["p-s-colour"] }}{% endif %}">
+
+                    <label for="p-t-colour-light">Primary element transparent colour:</label>
+                    <input type="color" name="p-t-colour-light" id="p-t-colour-light" class="form-control" value="{% if data != None %}{{ data["colours"]["light"]["p-t-colour"] }}{% endif %}">
+                    <label for="p-t-colour-transparency-light">Transparency:</label>
+                    <input type="text" pattern="^[0-1]?(\.\d+)?$" name="p-t-colour-transparency-light" id="p-t-colour-transparency-light" class="form-control" value="{% if data != None %}{{ data["colours"]["light"]["p-t-colour-transparency"] }}{% endif %}">
+
+                    <label for="p-a-colour-light">Primary element alt colour:</label>
+                    <input type="color" name="p-a-colour-light" id="p-a-colour-light" class="form-control" value="{% if data != None %}{{ data["colours"]["light"]["p-a-colour"] }}{% endif %}">
+
+                    <label for="s-s-colour-light">Secondary element solid colour:</label>
+                    <input type="color" name="s-s-colour-light" id="s-s-colour-light" class="form-control" value="{% if data != None %}{{ data["colours"]["light"]["s-s-colour"] }}{% endif %}">
+
+                    <label for="s-t-colour-light">Secondary element transparent colour:</label>
+                    <input type="color" name="s-t-colour-light" id="s-t-colour-light" class="form-control" value="{% if data != None %}{{ data["colours"]["light"]["s-t-colour"] }}{% endif %}">
+                    <label for="s-t-colour-transparency-light">Transparency:</label>
+                    <input type="text" pattern="^[0-1]?(\.\d+)?$" name="s-t-colour-transparency-light" id="s-t-colour-transparency-light" class="form-control" value="{% if data != None %}{{ data["colours"]["light"]["p-t-colour-transparency"] }}{% endif %}">
+                </div>
+
+                <script>
+                    document.getElementById('dark-toggle').addEventListener('click', function() {
+                        var content = document.getElementById('dark-content');
+                        if (content.style.display === 'none') {
+                            content.style.display = 'block';
+                            this.textContent = 'Dark mode v';
+                        } else {
+                            content.style.display = 'none';
+                            this.textContent = 'Dark mode >';
+                        }
+                    });
+
+                    document.getElementById('light-toggle').addEventListener('click', function() {
+                        var content = document.getElementById('light-content');
+                        if (content.style.display === 'none') {
+                            content.style.display = 'block';
+                            this.textContent = 'Light mode v';
+                        } else {
+                            content.style.display = 'none';
+                            this.textContent = 'Light mode >';
+                        }
+                    });
+                </script>
+
                 <button type="submit" class="btn btn-primary">Submit</button>
             </form>
 

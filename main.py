@@ -14,6 +14,25 @@ def encode_image(image):
     return base64_image
 
 
+def to_rgba(hex_colour, transparency):
+    hex_colour = hex_colour.lstrip('#')
+    r = int(hex_colour[0:2], 16)
+    g = int(hex_colour[2:4], 16)
+    b = int(hex_colour[4:6], 16)
+
+    return f"rgba({r}, {g}, {b}, {transparency})"
+
+
+def from_rgba(rgba):
+    rgba = rgba.split("(")[1].split(")")[0]
+    r, g, b, a = rgba.split(", ")
+    r = int(r)
+    g = int(g)
+    b = int(b)
+
+    return f"#{r:02x}{g:02x}{b:02x}", str(a)
+
+
 @app.route("/")
 def index():
     return render_template("main/index.html", title="Home")
@@ -110,6 +129,11 @@ def new_config():
         response = requests.post(f"{carterapi_baseurl}/get/portfolio-config", headers=headers, json=request_data).json()
         if response["result"] == "success":
             data = response["data"]
+            data["colours"]["light"]["p-t-colour"], data["colours"]["light"]["p-t-colour-transparency"] = from_rgba(data["colours"]["light"]["p-t-colour"])
+            data["colours"]["light"]["s-t-colour"], data["colours"]["light"]["s-t-colour-transparency"] = from_rgba(data["colours"]["light"]["s-t-colour"])
+
+            data["colours"]["dark"]["p-t-colour"], data["colours"]["dark"]["p-t-colour-transparency"] = from_rgba(data["colours"]["dark"]["p-t-colour"])
+            data["colours"]["dark"]["s-t-colour"], data["colours"]["dark"]["s-t-colour-transparency"] = from_rgba(data["colours"]["dark"]["s-t-colour"])
         else:
             data = None
             error = response
@@ -124,7 +148,37 @@ def new_config():
             "banners": {},
             "icon": "",
             "segments": [],
-            "favicon": ""
+            "favicon": "",
+            "colours": {
+                "light": {
+                    "main-colour": request.form.get("main-colour-light"),
+                    "off-colour": request.form.get("off-colour-light"),
+
+                    "bg-colour-1": request.form.get("bg-colour-1-light"),
+                    "bg-colour-2": request.form.get("bg-colour-2-light"),
+
+                    "p-s-colour": request.form.get("p-s-colour-light"),
+                    "p-t-colour": to_rgba(request.form.get("p-t-colour-light"), request.form.get("p-t-colour-transparency-light")),
+                    "p-a-colour": request.form.get("p-a-colour-light"),
+
+                    "s-s-colour": request.form.get("s-s-colour-light"),
+                    "s-t-colour": to_rgba(request.form.get("s-t-colour-light"), request.form.get("s-t-colour-transparency-light"))
+                },
+                "dark": {
+                    "main-colour": request.form.get("main-colour-dark"),
+                    "off-colour": request.form.get("off-colour-dark"),
+
+                    "bg-colour-1": request.form.get("bg-colour-1-dark"),
+                    "bg-colour-2": request.form.get("bg-colour-2-dark"),
+
+                    "p-s-colour": request.form.get("p-s-colour-dark"),
+                    "p-t-colour": to_rgba(request.form.get("p-t-colour-dark"), request.form.get("p-t-colour-transparency-dark")),
+                    "p-a-colour": request.form.get("p-a-colour-dark"),
+
+                    "s-s-colour": request.form.get("s-s-colour-dark"),
+                    "s-t-colour": to_rgba(request.form.get("s-t-colour-dark"), request.form.get("s-t-colour-transparency-dark"))
+                }
+            }
         }
 
         if "icondata" in request.files and request.files[f"icondata"].filename != '':
@@ -167,6 +221,12 @@ def new_config():
         response = requests.post(f"{carterapi_baseurl}/get/portfolio-config", headers=headers, json={}).json()
         if response["result"] == "success":
             data = response["data"]
+
+            data["colours"]["light"]["p-t-colour"], data["colours"]["light"]["p-t-colour-transparency"] = from_rgba(data["colours"]["light"]["p-t-colour"])
+            data["colours"]["light"]["s-t-colour"], data["colours"]["light"]["s-t-colour-transparency"] = from_rgba(data["colours"]["light"]["s-t-colour"])
+
+            data["colours"]["dark"]["p-t-colour"], data["colours"]["dark"]["p-t-colour-transparency"] = from_rgba(data["colours"]["dark"]["p-t-colour"])
+            data["colours"]["dark"]["s-t-colour"], data["colours"]["dark"]["s-t-colour-transparency"] = from_rgba(data["colours"]["dark"]["s-t-colour"])
         else:
             data = None
             error = response

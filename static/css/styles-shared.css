@@ -56,6 +56,11 @@
     max-height: 50px;
 }
 
+#dark-toggle:hover, #light-toggle:hover {
+    background-color: #ddd;  /* Change the background color */
+    cursor: pointer;  /* Change the cursor to a hand pointer */
+}
+
 .btn-return {
     margin: 50px 20px 20px;
 }
