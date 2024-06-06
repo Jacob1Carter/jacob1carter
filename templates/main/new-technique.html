@@ -1,0 +1,101 @@
+<!-- main/new-technique.html -->
+<!DOCTYPE html>
+<html lang="en-gb">
+
+    {% include "base/header.html" %}
+
+    <body>
+        {% include "base/navbar.html" %}
+
+        <div class="container main-content">
+
+            <form method="POST" action="jiujitsu/new-technique" id="technique-form" onsubmit="return validateForm()">
+                <div class="form-group">
+                    <label for="technique-name-en">Technique name (english):</label>
+                    <input type="text" name="technique-name-en" id="technique-name-en" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label for="technique-name-ja">Technique name (japanese):</label>
+                    <input type="text" name="technique-name-ja" id="technique-name-ja" class="form-control">
+                </div>
+
+                <div class="form-group">
+                    <label for="technique-description-en">Technique description (english):</label>
+                    <textarea name="technique-description-en" id="technique-description-en" class="form-control"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="technique-type">Technique type:</label>
+                    <select name="technique-type" id="technique-type" class="form-control" required>
+                        <option value="" disabled selected>Select a type</option>
+                        {% for type in types %}
+                            <option value="{{ type }}">{{ type }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="technique-subtype">Technique subtypes:</label>
+                    <div id="technique-subtype" class="form-group"></div>
+                </div>
+                <div class="form-group">
+                    <label for="appears-in">Appears in:</label>
+                    <input type="text" name="appears-in" id="appears-in" class="form-control">
+                </div>
+
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </form>
+
+            <script>
+                var types = {{ types | tojson | safe }};  // Parse JSON string to JavaScript object
+
+                function updateSubtypes() {
+                    var type = document.getElementById("technique-type").value;
+                    var subtypeContainer = document.getElementById("technique-subtype");
+                    subtypeContainer.innerHTML = "";  // Clear current options
+
+                    if (type == "") {
+                        // If no type is selected, disable the subtype checkboxes
+                        subtypeContainer.disabled = true;
+                    } else {
+                        // If a type is selected, enable the subtype checkboxes and populate them with the appropriate subtypes
+                        subtypeContainer.disabled = false;
+
+                        var subtypes = types[type];
+                        for (var i = 0; i < subtypes.length; i++) {
+                            var checkbox = document.createElement("input");
+                            checkbox.type = "checkbox";
+                            checkbox.name = "technique-subtype";
+                            checkbox.value = subtypes[i];
+                            subtypeContainer.appendChild(checkbox);
+                            subtypeContainer.appendChild(document.createTextNode(subtypes[i]));
+                            subtypeContainer.appendChild(document.createElement("br"));  // Add a line break
+                        }
+                    }
+                }
+
+                document.getElementById("technique-type").onchange = updateSubtypes;  // Call updateSubtypes() when the selected option changes
+            </script>
+
+            <script>
+                function validateForm() {
+                    var nameEn = document.getElementById("technique-name-en").value;
+                    var nameJa = document.getElementById("technique-name-ja").value;
+
+                    if (nameEn == "" && nameJa == "") {
+                        alert("At least one technique name must be filled out");
+                        return false;
+                    }
+                }
+            </script>
+
+            <script>
+                window.onload = updateSubtypes;  // Call updateSubtypes() when the page loads
+            </script>
+
+        </div>
+
+        {% include "base/footer.html" %}
+    </body>
+
+</html>
+
+<!-- /main/new-technique.html -->

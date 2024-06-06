@@ -19,50 +19,63 @@
                 {{ post_response }}
             {% endif %}
 
-            <form action="/portfolio/new-segment" method="post" enctype="multipart/form-data">
-                <label for="name">Segment name:</label>
-                <input type="text" name="name" id="name" class="form-control" value="{% if data != None %}{{ data["name"] }}{% endif %}">
-
-                <label for="title">Title:</label>
-                <input type="text" name="title" id="title" class="form-control" value="{% if data != None %}{{ data["title"] }}{% endif %}">
-
-                <label for="text">Text:</label>
-                <textarea name="text" id="text" class="form-control">{% if data != None %}{{ data["text"] }}{% endif %}</textarea>
-
-                <h5>Images:</h5>
-                <div class="indent-inputs" id="images-container">
-                    {% if data != None %}
-                        {% for imagedata in data["images"] %}
-                            <div class="image-group" id="image-group{{ loop.index - 1 }}">
-                                <label for="image{{ loop.index - 1 }}">Image:</label>
-                                <input type="file" id="image{{ loop.index - 1 }}" name="image{{ loop.index - 1 }}" accept=".png" class="form-control">
-                                <img src="{% if data != None %}data:image/png;base64,{{ imagedata }}{% endif %}" alt="icon" class="icon-preview">
-                                <button type="button" id="{{ loop.index - 1 }}" class="btn btn-danger remove-image" data-index="{{ loop.index - 1 }}">Remove</button>
-                            </div>
-                        {% endfor %}
-                    {% endif %}
+            <form action="/portfolio/new-segment{% if segment_id != None %}?id={{ segment_id }}{% endif %}" method="post" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label for="name">Segment name:</label>
+                    <input type="text" name="name" id="name" class="form-control" value="{% if data != None %}{{ data["name"] }}{% endif %}">
+                    <strong>Segments with the same names will overwrite each other</strong>
                 </div>
-                <button type="button" class="btn btn-primary" id="add-image">Add image</button>
 
-                <label for="icondata">Icon:</label>
-                <input type="file" name="icondata" id="icondata" class="form-control" accept=".png">
-                <img src="{% if data != None %}data:image/png;base64,{{ data["icon"] }}{% endif %}" alt="icon" class="icon-preview">
-
-                <h5>Links:</h5>
-                <div class="indent-inputs" id="links-container">
-                    {% if data != None %}
-                        {% for linkname, linkurl in data["links"].items() %}
-                            <div class="link-group" id="link-group{{ loop.index - 1 }}">
-                                <label for="linkname{{ loop.index - 1 }}">Link name:</label>
-                                <input type="text" id="linkname{{ loop.index - 1 }}" name="linkname{{ loop.index - 1 }}" class="form-control" value="{{ linkname }}">
-                                <label for="linkurl{{ loop.index - 1 }}">Link URL:</label>
-                                <input type="text" id="linkurl{{ loop.index - 1 }}" name="linkurl{{ loop.index - 1 }}" class="form-control" value="{{ linkurl }}">
-                                <button type="button" id="{{ loop.index - 1 }}" class="btn btn-danger remove-link" data-index="{{ loop.index - 1 }}">Remove</button>
-                            </div>
-                        {% endfor %}
-                    {% endif %}
+                <div class="form-group">
+                    <label for="title">Title:</label>
+                    <input type="text" name="title" id="title" class="form-control" value="{% if data != None %}{{ data["title"] }}{% endif %}">
                 </div>
-                <button type="button" class="btn btn-primary" id="add-link">Add link</button>
+
+                <div class="form-group">
+                    <label for="text">Text:</label>
+                    <textarea name="text" id="text" class="form-control">{% if data != None %}{{ data["text"] }}{% endif %}</textarea>
+                </div>
+
+                <div class="form-group">
+                    <h5>Images:</h5>
+                    <div class="indent-inputs" id="images-container">
+                        {% if data != None %}
+                            {% for imagedata in data["images"] %}
+                                <div class="image-group" id="image-group{{ loop.index - 1 }}">
+                                    <label for="image{{ loop.index - 1 }}">Image:</label>
+                                    <input type="file" id="image{{ loop.index - 1 }}" name="image{{ loop.index - 1 }}" accept=".png" class="form-control">
+                                    <img src="{% if data != None %}data:image/png;base64,{{ imagedata }}{% endif %}" alt="icon" class="icon-preview">
+                                    <button type="button" id="{{ loop.index - 1 }}" class="btn btn-danger remove-image" data-index="{{ loop.index - 1 }}">Remove</button>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                    <button type="button" class="btn btn-primary" id="add-image">Add image</button>
+                </div>
+
+                <div class="form-group">
+                    <label for="icondata">Icon:</label>
+                    <input type="file" name="icondata" id="icondata" class="form-control" accept=".png">
+                    <img src="{% if data != None %}data:image/png;base64,{{ data["icon"] }}{% endif %}" alt="icon" class="icon-preview">
+                </div>
+
+                <div class="form-group">
+                    <h5>Links:</h5>
+                    <div class="indent-inputs" id="links-container">
+                        {% if data != None %}
+                            {% for linkname, linkurl in data["links"].items() %}
+                                <div class="link-group" id="link-group{{ loop.index - 1 }}">
+                                    <label for="linkname{{ loop.index - 1 }}">Link name:</label>
+                                    <input type="text" id="linkname{{ loop.index - 1 }}" name="linkname{{ loop.index - 1 }}" class="form-control" value="{{ linkname }}">
+                                    <label for="linkurl{{ loop.index - 1 }}">Link URL:</label>
+                                    <input type="text" id="linkurl{{ loop.index - 1 }}" name="linkurl{{ loop.index - 1 }}" class="form-control" value="{{ linkurl }}">
+                                    <button type="button" id="{{ loop.index - 1 }}" class="btn btn-danger remove-link" data-index="{{ loop.index - 1 }}">Remove</button>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                    <button type="button" class="btn btn-primary" id="add-link">Add link</button>
+                </div>
 
                 <button type="submit" class="btn btn-primary">Submit</button>
             </form>

@@ -1,10 +1,17 @@
 from flask import Flask, render_template, request, redirect
 import requests
 import base64
+import json
 
 carterapi_baseurl = "http://127.0.0.1:5000/"
 
 app = Flask(__name__)
+
+
+HEADERS = {
+        'x-api-key': "t13y01789638d2L3Kk8rsj56hg789m7j",
+        'Content-Type': 'application/json'
+    }
 
 
 def encode_image(image):
@@ -50,11 +57,6 @@ def portfolio():
     config_error = None
     segment_error = None
 
-    headers = {
-        'x-api-key': "abc",
-        'Content-Type': 'application/json'
-    }
-
     if request.method == "POST":
         edit = request.form.get("edit")
         if edit:
@@ -71,7 +73,7 @@ def portfolio():
                     "id": config_preset_id
                 }
 
-                response = requests.post(f"{carterapi_baseurl}/get/portfolio-config", headers=headers, json=request_data).json()
+                response = requests.post(f"{carterapi_baseurl}/get/portfolio-config", headers=HEADERS, json=request_data).json()
                 if response["result"] == "success":
                     config_data = response["data"]
                 else:
@@ -85,7 +87,7 @@ def portfolio():
                     "id": segment_preset_id
                 }
 
-                response = requests.post(f"{carterapi_baseurl}/get/portfolio-segment", headers=headers, json=request_data).json()
+                response = requests.post(f"{carterapi_baseurl}/get/portfolio-segment", headers=HEADERS, json=request_data).json()
                 if response["result"] == "success":
                     segment_data = response["data"]
                 else:
@@ -114,11 +116,6 @@ def new_config():
         request_data = {
         }
 
-    headers = {
-        'x-api-key': "abc",
-        'Content-Type': 'application/json'
-    }
-
     post_error = None
     post_response = None
     error = None
@@ -126,7 +123,7 @@ def new_config():
     if config_id == "0":
         data = None
     else:
-        response = requests.post(f"{carterapi_baseurl}/get/portfolio-config", headers=headers, json=request_data).json()
+        response = requests.post(f"{carterapi_baseurl}/get/portfolio-config", headers=HEADERS, json=request_data).json()
         if response["result"] == "success":
             data = response["data"]
             data["colours"]["light"]["p-t-colour"], data["colours"]["light"]["p-t-colour-transparency"] = from_rgba(data["colours"]["light"]["p-t-colour"])
@@ -212,13 +209,13 @@ def new_config():
                 if request.form[key] != "" and request.form[key].isdigit():
                     new_data["segments"].append(int(request.form[key]))
 
-        response = requests.post(f"{carterapi_baseurl}/post/new/portfolio-config", headers=headers, json=new_data).json()
+        response = requests.post(f"{carterapi_baseurl}/post/new/portfolio-config", headers=HEADERS, json=new_data).json()
         if response["result"] == "success":
             post_response = response
         else:
             post_error = response
 
-        response = requests.post(f"{carterapi_baseurl}/get/portfolio-config", headers=headers, json={}).json()
+        response = requests.post(f"{carterapi_baseurl}/get/portfolio-config", headers=HEADERS, json={}).json()
         if response["result"] == "success":
             data = response["data"]
 
@@ -248,18 +245,13 @@ def new_segment():
     post_error = None
     post_response = None
 
-    headers = {
-        'x-api-key': "abc",
-        'Content-Type': 'application/json'
-    }
-
-    config_id = request.args.get("id")
-    if config_id:
+    segment_id = request.args.get("id")
+    if segment_id:
         request_data = {
-            "id": config_id
+            "id": segment_id
         }
 
-        response = requests.post(f"{carterapi_baseurl}/get/portfolio-segment", headers=headers, json=request_data).json()
+        response = requests.post(f"{carterapi_baseurl}/get/portfolio-segment", headers=HEADERS, json=request_data).json()
         if response["result"] == "success":
             data = response["data"]
         else:
@@ -287,6 +279,11 @@ def new_segment():
             if key.startswith("image"):
                 if request.files[key].filename != '':
                     new_data["images"].append(encode_image(request.files[key]))
+                elif data is not None:
+                    img_index = key[-1]
+                    if img_index.isdigit():
+                        if int(img_index) + 1 <= len(data["images"]):
+                            new_data["images"].append(data["images"][int(img_index)])
 
         for key in request.form:
             if key.startswith("linkname"):
@@ -294,7 +291,7 @@ def new_segment():
                 if request.form[key] != "" and request.form[f"linkurl{link_id}"] != "":
                     new_data["links"][request.form[key]] = request.form[f"linkurl{link_id}"]
 
-        response = requests.post(f"{carterapi_baseurl}/post/new/portfolio-segment", headers=headers, json=new_data).json()
+        response = requests.post(f"{carterapi_baseurl}/post/new/portfolio-segment", headers=HEADERS, json=new_data).json()
         if response["result"] == "success":
             post_response = response
         else:
@@ -308,8 +305,28 @@ def new_segment():
         data=data,
         error=error,
         post_response=post_response,
-        post_error=post_error
+        post_error=post_error,
+        segment_id=segment_id,
     )
+
+
+@app.route("/jiujitsu", methods=["GET", "POST"])
+def jiujitsu():
+
+    return render_template("main/jiujitsu.html", title="Jiu Jitsu")
+
+
+@app.route("/jiujitsu/new-technique", methods=["GET", "POST"])
+def new_technique():
+    types = {
+        "strike": ["test1", "test2"],
+        "throw": ["test3", "test4"],
+    }
+
+    techniques = {
+        "id": {"name_en", "name_jp"}
+    }
+    return render_template("main/new-technique.html", title="New Technique", types=types)
 
 
 if __name__ == '__main__':
