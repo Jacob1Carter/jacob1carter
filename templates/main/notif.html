@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Simple Notifications</title>
+</head>
+<body>
+    <h1>Browser Notification Demo</h1>
+
+    <button onclick="enableNotifications()">
+        Enable Notifications
+    </button>
+
+    <button onclick="sendNotification()">
+        Send Test Notification
+    </button>
+
+    <script>
+        function enableNotifications() {
+            if (!("Notification" in window)) {
+                alert("This browser does not support notifications.");
+                return;
+            }
+
+            Notification.requestPermission().then(permission => {
+                alert("Permission: " + permission);
+            });
+        }
+
+        function sendNotification() {
+            if (Notification.permission !== "granted") {
+                alert("Please enable notifications first.");
+                return;
+            }
+
+            new Notification("Hello 👋", {
+                body: "This is a test notification from Flask app!",
+                icon: "https://via.placeholder.com/100"
+            });
+        }
+    </script>
+</body>
+</html>
