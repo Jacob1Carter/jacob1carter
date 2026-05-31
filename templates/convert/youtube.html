@@ -1,0 +1,35 @@
+<!-- convert/youtube.html -->
+
+<html lang="en-gb">
+
+    {% include "base/header.html" %}
+
+    <body>
+        {% include "base/navbar.html" %}
+
+        <div class="container main-content">
+            <form method="POST" action="/convert/youtube-input">
+                <input type="text" name="link">
+
+                <select name="linktype">
+                    <option value="single">Single</option>
+                    <option value="Playlist">Playlist</option>
+                </select>
+
+                <select name="filetype">
+                    <option value="mp4">Mp4</option>
+                    <option value="mp4">Mp3</option>
+                    <option value="ogg">Ogg</option>
+                    <option value="wav">Wav</option>
+                </select>
+                <button type="submit">Submit</button>
+            </form>
+
+        </div>
+
+        {% include "base/footer.html" %}
+    </body>
+
+</html>
+
+<!-- convert/youtube.html -->
