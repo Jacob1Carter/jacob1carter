@@ -1,0 +1,43 @@
+* {
+    font-family: Arial;
+}
+
+html, body {
+    height: 100%;
+    margin: 0;
+}
+
+body {
+    display: flex;
+    justify-content: center;
+}
+
+.main-content {
+    width: 500px;
+    margin: 0 auto;
+}
+
+.day-log {
+    color: #000;
+    text-decoration: none;
+    border: 1px solid #000;
+    margin-bottom: 15px;
+    display: block;
+}
+
+.day-log div {
+    padding: 5px;
+}
+
+.day-title {
+    border-bottom: 1px solid #000;
+    text-align: center;
+}
+
+.day-content {
+    min-height: 36;
+}
+
+.day-footer {
+    border-top: 1px solid #000;
+}
