@@ -1,0 +1,23 @@
+<!-- journal/edit-log.html -->
+
+<html lang="en-gb">
+
+    {% include "journal/head.html" %}
+
+    <body>
+
+        <div class="container main-content">
+            <h3>{{ date_formatted }}</h3>
+            <form method="POST" action="/journal/edit-log-input/{{ log_id }}">
+                <textarea name="log-content">{{ log_content }}</textarea>
+
+                <button type="submit">Submit</button>
+            </form>
+        </div>
+
+        {% include "base/footer.html" %}
+    </body>
+
+</html>
+
+<!-- /journal/edit-log.html -->

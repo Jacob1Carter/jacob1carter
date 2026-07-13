@@ -1,0 +1,32 @@
+<!-- journal/index.html -->
+
+<html lang="en-gb">
+
+    {% include "journal/head.html" %}
+
+    <body>
+
+        <div class="container main-content">
+            {% for day_i in days_dict %}
+                {% if days_dict[day_i]['data'] is not none %}
+                    <a href="/journal/edit/{{ days_dict[day_i]['data'][0] }}" class="day-log">
+                        <div class="day-title">{{ days_dict[day_i]["name"] }}</div>
+                        <div class="day-content">{{ days_dict[day_i]["data"][1] }}</div>
+                        <div class="day-footer">ID: {{ days_dict[day_i]["data"][0] }}, Last edited at: {{ days_dict[day_i]["data"][2] }}</div>
+                    </a>
+                {% else %}
+                    <a href="/journal/create/{{ year }}/{{ month }}/{{ day_i }}" class="day-log">
+                        <div class="day-title">{{ days_dict[day_i]["name"] }}</div>
+                        <div class="day-content"></div>
+                        <div class="day-footer">Not started yet</div>
+                    </a>
+                {% endif %}
+            {% endfor %}
+        </div>
+
+        {% include "base/footer.html" %}
+    </body>
+
+</html>
+
+<!-- /journal/index.html -->
