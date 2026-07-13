@@ -8,14 +8,80 @@
 
         <div class="container main-content">
             <h3>{{ date_formatted }}</h3>
-            <form method="POST" action="/journal/edit-log-input/{{ log_id }}">
-                <textarea name="log-content">{{ log_content }}</textarea>
 
-                <button type="submit">Submit</button>
-            </form>
+            <textarea id="log-content">{{ content }}</textarea>
+
+            <p id="save-status">Saved</p>
         </div>
 
         {% include "base/footer.html" %}
+
+        <script>
+
+            const textarea = document.getElementById("log-content");
+            const status = document.getElementById("save-status");
+
+            let saveTimeout;
+
+            textarea.addEventListener("input", () => {
+
+                status.textContent = "Unsaved changes";
+
+                clearTimeout(saveTimeout);
+
+                saveTimeout = setTimeout(saveLog, 3000);
+
+            });
+
+            async function saveLog() {
+
+                status.textContent = "Saving...";
+
+                const response = await fetch("/journal/edit-log-input/{{ log_id }}", {
+
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+
+                    body: JSON.stringify({
+                        content: textarea.value
+                    })
+
+                });
+
+                if (response.ok) {
+                    status.textContent = "Saved";
+                }
+                else {
+                    status.textContent = "Save failed";
+                }
+
+            }
+
+            window.addEventListener("pagehide", () => {
+
+                fetch("/journal/edit-log-input/{{ log_id }}", {
+
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+
+                    body: JSON.stringify({
+                        content: textarea.value
+                    }),
+
+                    keepalive: true
+
+                });
+
+            });
+
+        </script>
+
     </body>
 
 </html>

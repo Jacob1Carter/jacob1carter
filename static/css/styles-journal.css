@@ -13,8 +13,15 @@ body {
 }
 
 .main-content {
+    width: 100%;
+    margin: 10px;
+}
+
+@media (min-width: 768px) {
+    .main-content {
     width: 500px;
     margin: 0 auto;
+    }
 }
 
 .day-log {
@@ -36,6 +43,14 @@ body {
 
 .day-content {
     min-height: 36;
+    max-height: 350px;
+    overflow-y: hidden;
+}
+
+@media (min-width: 768px) {
+    .day-content {
+    overflow-y: scroll;
+    }
 }
 
 .day-footer {

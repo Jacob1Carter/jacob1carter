@@ -111,12 +111,24 @@ def edit_log(log_id):
 
 @journal.route("/edit-log-input/<int:log_id>", methods=["POST"])
 def edit_log_input(log_id):
-    content = request.form.get("log-content")
-    print(content)
+
+    data = request.get_json()
+
+    content = data["content"]
+
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
     conn, cur = get_db_conn()
-    query = "UPDATE journal_days SET content = ?, edited_at = ? WHERE id = ?"
+
+    query = """
+        UPDATE journal_days
+        SET content = ?, edited_at = ?
+        WHERE id = ?
+    """
+
     cur.execute(query, (content, timestamp, log_id))
+
     conn.commit()
     conn.close()
-    return redirect(url_for("journal.journal_index"))
+
+    return {"status": "saved"}
