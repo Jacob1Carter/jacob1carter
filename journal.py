@@ -1,4 +1,4 @@
-from flask import session, Blueprint, render_template, request, redirect, url_for
+from flask import session, Blueprint, render_template, request, redirect, url_for, make_response
 from datetime import datetime
 from database import get_db_conn, create_table
 import calendar
@@ -68,7 +68,7 @@ def journal_index():
             }
     
     conn.close()
-    return render_template(
+    response = render_template(
         "journal/index.html",
         title="Journal",
         days_dict=days_dict,
@@ -77,6 +77,11 @@ def journal_index():
         year=year,
         days_in_month=days_in_month,
     )
+
+    resp = make_response(response)
+    resp.headers["Cache-Control"] = "no-store"
+
+    return resp
 
 
 @journal.route("/create/<int:year>/<int:month>/<int:day>")

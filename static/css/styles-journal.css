@@ -45,6 +45,9 @@ body {
     min-height: 36;
     max-height: 350px;
     overflow-y: hidden;
+    overflow-x: hidden;
+    word-wrap: break-word;
+    padding: 10px 5px 10px 5px !important;
 }
 
 @media (min-width: 768px) {
@@ -55,4 +58,13 @@ body {
 
 .day-footer {
     border-top: 1px solid #000;
+}
+
+.log-content {
+    width: 100%;
+    resize: none;
+    min-height: 160px;
+    overflow: hidden;
+    box-sizing: border-box;
+    padding: 15px 10px 20px 10px;
 }

@@ -25,6 +25,22 @@
         </div>
 
         {% include "base/footer.html" %}
+        
+        <script>
+            let firstLoad = true;
+
+            window.addEventListener("pageshow", () => {
+
+                if (firstLoad) {
+                    firstLoad = false;
+                    return;
+                }
+
+                location.reload();
+
+            });
+        </script>
+
     </body>
 
 </html>

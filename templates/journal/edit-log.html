@@ -9,7 +9,7 @@
         <div class="container main-content">
             <h3>{{ date_formatted }}</h3>
 
-            <textarea id="log-content">{{ content }}</textarea>
+            <textarea class="log-content" id="log-content">{{ content }}</textarea>
 
             <p id="save-status">Saved</p>
         </div>
@@ -23,7 +23,17 @@
 
             let saveTimeout;
 
+            function resizeTextarea() {
+                textarea.style.height = "auto";
+                textarea.style.height = textarea.scrollHeight + "px";
+            }
+
+            // Set the correct height when the page first loads.
+            resizeTextarea();
+
             textarea.addEventListener("input", () => {
+
+                resizeTextarea();
 
                 status.textContent = "Unsaved changes";
 
