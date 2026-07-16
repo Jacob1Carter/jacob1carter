@@ -6,6 +6,9 @@ from portfolioroutes import portfolio
 from convert import convert
 from journal import journal
 from database import construct_db
+from dotenv import load_dotenv
+
+load_dotenv()
 
 app = Flask(__name__)
 app.secret_key = "b'+=\x02\x1eLN\x8dM\xf9\xc7L\xb0\x9b\xe8\x1c\x1c=i28\x021\xb0/'"

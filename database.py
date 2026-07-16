@@ -1,33 +1,55 @@
-import sqlite3
+import psycopg
 import os
 import re
 
 
 def get_db_conn():
-    conn = sqlite3.connect("data/database.db")
+    conn = psycopg.connect(
+        os.environ["DATABASE_URL"]
+    )
     cur = conn.cursor()
     return conn, cur
 
 
 def construct_db():
-    os.makedirs("data", exist_ok=True)
-    if not os.path.exists("data/database.db"):
-        with open("data/database.db", "w"):
-            pass
-        conn, cur = get_db_conn()
-        cur.execute("""
-        CREATE TABLE IF NOT EXISTS db_tables (
-        
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
+
+    conn, cur = get_db_conn()
+
+    cur.execute("""
+    CREATE TABLE IF NOT EXISTS db_tables (
+
+        id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
         table_name TEXT NOT NULL,
         table_desc TEXT,
-        created_at_utc TEXT DEFAULT CURRENT_TIMESTAMP
-        )""")
-        
-        cur.execute("INSERT INTO db_tables (table_name, table_desc) VALUES ('tb_tables', 'A table for all other tables')")
+        created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
 
-        conn.commit()
-        conn.close()
+    )
+    """)
+
+    cur.execute(
+        """
+        SELECT 1 FROM db_tables 
+        WHERE table_name = %s
+        """,
+        ("db_tables",)
+    )
+
+    if cur.fetchone() is None:
+
+        cur.execute(
+            """
+            INSERT INTO db_tables
+            (table_name, table_desc)
+            VALUES (%s, %s)
+            """,
+            (
+                "db_tables",
+                "A table for all other tables"
+            )
+        )
+
+    conn.commit()
+    conn.close()
 
 
 def create_table(query):
@@ -44,7 +66,7 @@ def create_table(query):
     conn, cur = get_db_conn()
     try:
         cur.execute(
-            "SELECT 1 FROM db_tables WHERE table_name = ? LIMIT 1",
+            "SELECT 1 FROM db_tables WHERE table_name = %s LIMIT 1",
             (table_name,),
         )
         already_exists = cur.fetchone() is not None
@@ -52,7 +74,7 @@ def create_table(query):
         if not already_exists:
             cur.execute(query)
             cur.execute(
-                "INSERT INTO db_tables (table_name) VALUES (?)",
+                "INSERT INTO db_tables (table_name) VALUES (%s)",
                 (table_name,),
             )
             conn.commit()
@@ -61,8 +83,3 @@ def create_table(query):
 
     finally:
         conn.close()
-
-
-def drop_db():
-    if os.path.exists("data/database.db"):
-        os.remove("data/database.db")

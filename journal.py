@@ -11,10 +11,10 @@ def check_table():
     create_table("""
     CREATE TABLE IF NOT EXISTS journal_days (
     
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    date TEXT NOT NULL,
+    id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    date DATE UNIQUE NOT NULL,
     content TEXT DEFAULT '',
-    edited_at TEXT NOT NULL
+    edited_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )""")
 
 
@@ -34,40 +34,70 @@ def format_journal_date(year, month, day, full=False):
 
 @journal.route("/")
 def journal_index():
+
     month = request.args.get("month", type=int)
     year = request.args.get("year", type=int)
+
+    now = datetime.now()
 
     today = None
 
     if month is None:
-        month = datetime.now().month
-        today = datetime.now().day
+        month = now.month
 
     if year is None:
-        year = datetime.now().year
+        year = now.year
+
+    if month < 1 or month > 12:
+        month = now.month
+
+    if month == now.month and year == now.year:
+        today = now.day
 
     days_in_month = calendar.monthrange(year, month)[1]
 
     days_dict = {}
 
     conn, cur = get_db_conn()
-    for day_i in range(1, days_in_month+1):
-        date_str = f"{year:04d}-{month:02d}-{day_i:02d}"
-        query = "SELECT id, content, edited_at FROM journal_days WHERE date = ?"
-        cur.execute(query, (date_str,))
-        row = cur.fetchone()
-        if row:
+
+    start_date = datetime(year, month, 1).date()
+    end_date = datetime(year, month, days_in_month).date()
+
+    query = """
+        SELECT id, date, content, edited_at
+        FROM journal_days
+        WHERE date BETWEEN %s AND %s
+    """
+
+    cur.execute(query, (start_date, end_date))
+
+    rows = cur.fetchall()
+
+    journal_entries = {
+        row[1].day: row
+        for row in rows
+    }
+
+    for day_i in range(1, days_in_month + 1):
+
+        if day_i in journal_entries:
             days_dict[day_i] = {
                 "name": format_journal_date(year, month, day_i),
-                "data": row
+                "data": (
+                    journal_entries[day_i][0],
+                    journal_entries[day_i][2],
+                    journal_entries[day_i][3]
+                )
             }
+
         else:
             days_dict[day_i] = {
                 "name": format_journal_date(year, month, day_i),
                 "data": None
             }
-    
+
     conn.close()
+
     response = render_template(
         "journal/index.html",
         title="Journal",
@@ -86,32 +116,58 @@ def journal_index():
 
 @journal.route("/create/<int:year>/<int:month>/<int:day>")
 def create_log(year, month, day):
+
     conn, cur = get_db_conn()
-    date_str = f"{year:04d}-{month:02d}-{day:02d}"
-    query = "SELECT id FROM  journal_days WHERE date = ?"
-    cur.execute(query, (date_str,))
-    log_id = cur.fetchone()
-    if not log_id:
-        query = "INSERT INTO journal_days (date, edited_at) VALUES (?, ?)"
-        cur.execute(query, (date_str, datetime.now()))
-        log_id = cur.lastrowid
-        conn.commit()
-    
+
+    date_value = datetime(year, month, day).date()
+
+    query = """
+        INSERT INTO journal_days (date)
+        VALUES (%s)
+        ON CONFLICT (date) DO UPDATE
+        SET date = EXCLUDED.date
+        RETURNING id
+    """
+
+    cur.execute(query, (date_value,))
+
+    log_id = cur.fetchone()[0]
+
+    conn.commit()
     conn.close()
+
     return redirect(url_for("journal.edit_log", log_id=log_id))
 
 
 @journal.route("/edit/<log_id>")
 def edit_log(log_id):
+
     conn, cur = get_db_conn()
-    query = "SELECT date, content FROM journal_days WHERE id = ?"
+
+    query = "SELECT date, content FROM journal_days WHERE id = %s"
     cur.execute(query, (log_id,))
+
     row = cur.fetchone()
+
     date = row[0]
     content = row[1]
-    year, month, day = date.split("-")
-    date_formatted = format_journal_date(int(year), int(month), int(day), True)
-    return render_template("journal/edit-log.html", title=f"Journal - {date_formatted}", log_id=log_id, date_formatted=date_formatted, content=content)
+
+    date_formatted = format_journal_date(
+        date.year,
+        date.month,
+        date.day,
+        True
+    )
+
+    conn.close()
+
+    return render_template(
+        "journal/edit-log.html",
+        title=f"Journal - {date_formatted}",
+        log_id=log_id,
+        date_formatted=date_formatted,
+        content=content
+    )
 
 
 @journal.route("/edit-log-input/<int:log_id>", methods=["POST"])
@@ -121,14 +177,14 @@ def edit_log_input(log_id):
 
     content = data["content"]
 
-    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    timestamp = datetime.now()
 
     conn, cur = get_db_conn()
 
     query = """
         UPDATE journal_days
-        SET content = ?, edited_at = ?
-        WHERE id = ?
+        SET content = %s, edited_at = %s
+        WHERE id = %s
     """
 
     cur.execute(query, (content, timestamp, log_id))
