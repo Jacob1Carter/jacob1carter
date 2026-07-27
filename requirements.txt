@@ -2,3 +2,5 @@ flask
 gunicorn
 psycopg[binary]
 python-dotenv
+cryptography
+argon2-cffi

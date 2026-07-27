@@ -1,0 +1,25 @@
+<!-- journal/verify.html -->
+
+<html lang="en-gb">
+
+    {% include "journal/head.html" %}
+
+    <body>
+
+        <div class="container main-content">
+            <form action="/journal/verify-input" method="POST">
+
+                <lable for="passkey">Enter pass:</lable>
+                <input type="password" name="passkey" id="passkey" required>
+
+                <button type="submit">Submit</button>
+            </form>
+        </div>
+
+        {% include "base/footer.html" %}
+
+    </body>
+
+</html>
+
+<!-- /journal/verify.html -->
