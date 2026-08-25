@@ -15,6 +15,7 @@ body {
 .main-content {
     width: 100%;
     margin: 10px;
+    padding-top: 40px;
 }
 
 @media (min-width: 768px) {
@@ -22,6 +23,67 @@ body {
     width: 500px;
     margin: 0 auto;
     }
+}
+
+.header-menu {
+    display: flex;
+    position: fixed;
+
+    height: 30px;
+    width: 100%;
+
+    background-color: #FFF;
+    border-bottom: 1px solid #000;
+
+    top: 0;
+    left: 0;
+
+    justify-content: space-around;
+    align-items: center;
+
+    z-index: 100;
+}
+
+.dropdown {
+    position: relative;
+}
+
+.dropdown summary {
+    cursor: pointer;
+    list-style: none;
+}
+
+.dropdown summary::-webkit-details-marker {
+    display: none;
+}
+
+.dropdown-menu {
+    position: absolute;
+
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+
+    background-color: #FFF;
+    border: 1px solid #000;
+
+    min-width: 100px;
+
+    display: flex;
+    flex-direction: column;
+
+    z-index: 101;
+}
+
+.dropdown-menu a {
+    padding: 5px 10px;
+    text-decoration: none;
+    color: #000;
+    white-space: nowrap;
+}
+
+.dropdown-menu a:hover {
+    background-color: #EEE;
 }
 
 .day-log {

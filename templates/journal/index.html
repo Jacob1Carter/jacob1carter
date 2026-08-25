@@ -8,47 +8,96 @@
 
         <div class="container main-content">
 
-            {% for day_i in days_dict %}
+            <div class="header-menu">
 
-                {% if days_dict[day_i]["data"] is not none %}
+                <a href="/journal/previous-month">&lt;</a>
 
-                    <a href="{{ url_for('journal.edit_log', log_id=days_dict[day_i]['data'][0]) }}" class="day-log">
+                <details class="dropdown">
+                    <summary>{{ month }}</summary>
 
-                        <div class="day-title">
-                            {{ days_dict[day_i]["name"] }}
-                        </div>
+                    <div class="dropdown-menu">
+                        <a href="/journal?year={{ year }}&month=1">January</a>
+                        <a href="/journal?year={{ year }}&month=2">February</a>
+                        <a href="/journal?year={{ year }}&month=3">March</a>
+                        <a href="/journal?year={{ year }}&month=4">April</a>
+                        <a href="/journal?year={{ year }}&month=5">May</a>
+                        <a href="/journal?year={{ year }}&month=6">June</a>
+                        <a href="/journal?year={{ year }}&month=7">July</a>
+                        <a href="/journal?year={{ year }}&month=8">August</a>
+                        <a href="/journal?year={{ year }}&month=9">September</a>
+                        <a href="/journal?year={{ year }}&month=10">October</a>
+                        <a href="/journal?year={{ year }}&month=11">November</a>
+                        <a href="/journal?year={{ year }}&month=12">December</a>
+                    </div>
+                </details>
 
-                        <div class="day-content">
-                            {{ days_dict[day_i]["data"][1] }}
-                        </div>
+                <details class="dropdown">
+                    <summary>{{ year }}</summary>
 
-                        <div class="day-footer">
-                            ID: {{ days_dict[day_i]["data"][0] }},
-                            Last edited at: {{ days_dict[day_i]["data"][2] }}
-                        </div>
+                    <div class="dropdown-menu">
+                        <a href="/journal?year=2026&month={{ month }}">2026</a>
+                        <a href="/journal?year=2025&month={{ month }}">2025</a>
+                        <a href="/journal?year=2024&month={{ month }}">2024</a>
+                        <a href="/journal?year=2023&month={{ month }}">2023</a>
+                        <a href="/journal?year=2022&month={{ month }}">2022</a>
+                    </div>
+                </details>
 
-                    </a>
+                <a href="/journal/next-month">&gt;</a>
 
-                {% else %}
+            </div>
 
-                    <a href="{{ url_for('journal.create_log', y=year, m=month, d=day_i) }}" class="day-log">
+            <div class="days_list">
+                {% for day_i in days_dict %}
 
-                        <div class="day-title">
-                            {{ days_dict[day_i]["name"] }}
-                        </div>
+                    {% if days_dict[day_i]["data"] is not none %}
 
-                        <div class="day-content">
-                        </div>
+                        <a href="{{ url_for('journal.edit_log', log_id=days_dict[day_i]['data'][0]) }}" class="day-log">
 
-                        <div class="day-footer">
-                            Not started yet
-                        </div>
+                            <div class="day-title">
+                                {{ days_dict[day_i]["name"] }}
+                            </div>
 
-                    </a>
+                            <div class="day-content">
+                                {{ days_dict[day_i]["data"][1] }}
+                            </div>
 
-                {% endif %}
+                            <div class="day-footer">
+                                ID: {{ days_dict[day_i]["data"][0] }},
+                                Last edited at: {{ days_dict[day_i]["data"][2] }}
+                            </div>
 
-            {% endfor %}
+                        </a>
+
+                    {% else %}
+
+                        <a href="{{ url_for('journal.create_log', y=year, m=month, d=day_i) }}" class="day-log">
+
+                            <div class="day-title">
+                                {{ days_dict[day_i]["name"] }}
+                            </div>
+
+                            <div class="day-content">
+                            </div>
+
+                            <div class="day-footer">
+                                Not started yet
+                            </div>
+
+                        </a>
+
+                    {% endif %}
+
+                {% endfor %}
+            </div>
+            <div class="footer-menu">
+                <form method="POST" action="journal/footer-menu">
+                    <input type="month">
+                    <input type="year">
+                    <a href="/journal">Today (fix)</a>
+                    <a href="/journal/data">Data</a>
+                </form>
+            </div>
 
         </div>
 
